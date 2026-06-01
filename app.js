@@ -17,8 +17,10 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PATCH, OPTIONS");
-
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, DELETE, PATCH, OPTIONS",
+    );
 
     if (req.method === "OPTIONS") {
         return res.status(200).end();
@@ -44,7 +46,7 @@ app.use((error, req, res, next) => {
     console.log("ERROR CODE:", error.code);
     console.log("ERROR MESSAGE:", error.message);
     console.log("FULL ERROR:", error);
-    
+
     if (req.file) {
         fs.unlink(req.file.path, (err) => console.log(err));
     }
@@ -64,16 +66,18 @@ app.use((error, req, res, next) => {
     if (res.headersSent) {
         return next(error);
     }
-    res.status(error.code || 500);
+    const statusCode = typeof error.code === "number" ? error.code : 500;
+    res.status(statusCode);
     res.json({ message: error.message } || "An unknown error occurd");
 });
 
 mongoose
-    .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.lvsin.mongodb.net/`)
+    .connect(
+        `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.lvsin.mongodb.net/`,
+    )
     .then(() => {
         app.listen(5000);
     })
     .catch((err) => {
         console.log(err);
     });
-
