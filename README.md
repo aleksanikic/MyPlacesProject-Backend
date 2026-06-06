@@ -10,16 +10,16 @@
 ##  Routes and Functionality
 
 ### 1. Authentication
-Handles secure user registration and login, ensuring that passwords are safely hashed and users receive tokens (like JWT) to keep their sessions secure.
+Handles secure user registration and login, ensuring that passwords are safely hashed and users receive JWTs for authenticated access to protected routes.
 
 ### 2. Users List
 Handles a GET request to fetch all registered users directly from the database, providing the data needed for the application's landing page.
 
 ### 3. Places Management
-Connects to MongoDB to manage the creation, reading, updating, and deletion of user places. It references each place to its specific creator and stores the geographic coordinates needed by the frontend.
+Connects to MongoDB to manage the creation, reading, updating, and deletion of user places. Each place is associated with its creator and provides location data for the frontend map interface.
 
 ### 4. Image Handling
-Manages the receiving, storing, and providing of the cus  tom photos that users upload when they add a new place or create a new account.
+Manages the receiving, storing, and providing of the custom photos that users upload when they add a new place or create a new account.
 
 ## How to run the program locally:
   In the terminal, we run the command npm install.<br>
