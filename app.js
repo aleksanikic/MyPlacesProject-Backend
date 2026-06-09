@@ -1,4 +1,4 @@
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -8,7 +8,6 @@ const userRoutes = require("./router/user-routes.js");
 
 const HttpError = require("./models/http-error.js");
 
-const path = require("path");
 
 const app = express();
 app.use((req, res, next) => {
@@ -31,8 +30,6 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.use("/uploads/images", express.static(path.join("uploads", "images")));
-
 app.use("/api/places", placesRoutes);
 
 app.use("/api/user", userRoutes);
@@ -46,7 +43,13 @@ app.use((req, res, next) => {
 
 app.use((error, req, res, next) => {
     if (req.file) {
-        fs.unlink(req.file.path, (err) => console.log(err));
+        cloudinary.uploader.destroy(req.file.filename, (err, result) => {
+            if (err) {
+                console.log("Cloudinary deletion error:", err);
+            } else {
+                console.log("Cleaned up orphaned Cloudinary image.");
+            }
+        });
     }
 
     if (res.headersSent) {
@@ -54,7 +57,7 @@ app.use((error, req, res, next) => {
     }
     const statusCode = typeof error.code === "number" ? error.code : 500;
     res.status(statusCode);
-    res.json({ message: error.message } || "An unknown error occurd");
+    res.json({ message: error.message } || "An unknown error occurred");
 });
 
 mongoose
