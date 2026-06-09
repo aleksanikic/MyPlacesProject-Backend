@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
 
 const getCoordsForAdrress = require("../util/location.js");
 const Place = require("../models/place.js");
@@ -69,7 +70,7 @@ const createPlace = async (req, res, next) => {
         );
     }
 
-    const { title, description, address,} = req.body;
+    const { title, description, address } = req.body;
 
     let coordinates;
     try {
@@ -189,7 +190,14 @@ const deletePlace = async (req, res, next) => {
         );
         return next(error);
     }
-    const imagePath = place.image;
+    const extractPublicId = (url) => {
+        const splitUrl = url.split("/");
+        const folder = splitUrl[splitUrl.length - 2];
+        const fileWithExtension = splitUrl[splitUrl.length - 1];
+        const file = fileWithExtension.split(".");
+        return `${folder}/${file}`;
+    };
+    const cloudImageId = extractPublicId(place.image);
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
@@ -204,7 +212,7 @@ const deletePlace = async (req, res, next) => {
         );
         return next(error);
     }
-    fs.unlink(imagePath, (err) => console.log(err));
+    cloudinary.uploader.destroy(cloudImageId, (err) => console.log(err));
     res.status(200).json({ message: "Deleted place" });
 };
 
